@@ -1,0 +1,46 @@
+# 先導入需要的模組
+import pandas as pd
+import numpy as np
+from scipy.stats import pearsonr, t
+
+# 載入 Excel 檔案（請先手動上傳）
+df = pd.read_excel("/content/Data.xlsx")
+
+# 將 Gender 轉成數值：male = 1, female = 0
+df['Gender_num'] = df['Gender'].map({'male': 1, 'female': 0})
+
+# 1. IQ vs. Kiss Count
+
+# 轉成數值（NaN 若有非數字）
+df['IQ'] = pd.to_numeric(df['IQ'], errors='coerce')
+df['Kiss Count'] = pd.to_numeric(df['Kiss Count'], errors='coerce')
+
+# 選定固定區間：D2:D201 與 C2:C201
+iq = df['IQ'].iloc[0:200]  # Excel 是從 row 2 開始（Python 第 1 筆）
+kiss = df['Kiss Count'].iloc[0:200]
+
+# 硬算 Pearson r，忽略 NaN
+valid = iq.notna() & kiss.notna()
+iq_valid = iq[valid]
+kiss_valid = kiss[valid]
+
+r = iq_valid.corr(kiss_valid)
+n = 200
+dfree = n - 2
+t_value = (r * np.sqrt(dfree)) / np.sqrt(1 - r**2)
+
+from scipy.stats import t as t_dist
+p_excel = t_dist.sf(abs(t_value), dfree) * 2
+
+# 判斷是否顯著
+if isinstance(p_excel, float):
+    significance = "Significant" if p_excel < 0.05 else "Not Significant"
+else:
+    significance = "N/A"
+
+# 輸出結果（標註是哪一組變數）
+print("Result for: IQ vs. Kiss Count")
+print("r-value =", r)
+print("t-value =", t_value)
+print("p-value =", p_excel)
+print("→ So, the relationship is", significance.lower() + ".")
