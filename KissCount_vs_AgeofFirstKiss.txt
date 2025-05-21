@@ -45,3 +45,36 @@ print("r-value =", r)
 print("t-value =", t_value)
 print("p-value =", p_excel)
 print("→ So, the relationship is", significance.lower() + ".")
+
+# 匯入套件
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 讀取 Excel 資料（確認你已上傳 Data.xlsx）
+df = pd.read_excel("/content/Data.xlsx")
+
+# 將需要的欄位轉為數值
+df['Kiss Count'] = pd.to_numeric(df['Kiss Count'], errors='coerce')
+df['Age of First Kiss'] = pd.to_numeric(df['Age of First Kiss'], errors='coerce')
+
+# 選取前 200 筆資料
+kiss = df['Kiss Count'].iloc[0:200]
+age = df['Age of First Kiss'].iloc[0:200]
+
+# 篩除缺失值
+valid = kiss.notna() & age.notna()
+kiss_valid = kiss[valid]
+age_valid = age[valid]
+
+# 畫圖：散佈圖 + 迴歸線
+plt.figure(figsize=(8, 6))
+sns.regplot(x=age_valid, y=kiss_valid, scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+plt.title("Kiss Count vs. Age of First Kiss")
+plt.xlabel("Age of First Kiss")
+plt.ylabel("Kiss Count")
+plt.grid(True)
+
+# 儲存圖檔（用於 Overleaf）
+plt.savefig("Kiss_Count_vs_Age_of_First_Kiss.png", dpi=300)
+plt.show()
