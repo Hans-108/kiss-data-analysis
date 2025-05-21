@@ -45,3 +45,36 @@ print("r-value =", r)
 print("t-value =", t_value)
 print("p-value =", p_excel)
 print("→ So, the relationship is", significance.lower() + ".")
+
+# 匯入套件
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 讀取 Excel 檔案（請確認已上傳 Data.xlsx）
+df = pd.read_excel("/content/Data.xlsx")
+
+# 轉換為數值欄位
+df['IQ'] = pd.to_numeric(df['IQ'], errors='coerce')
+df['Age of First Kiss'] = pd.to_numeric(df['Age of First Kiss'], errors='coerce')
+
+# 取前200筆資料
+iq = df['IQ'].iloc[0:200]
+age = df['Age of First Kiss'].iloc[0:200]
+
+# 濾除 NaN
+valid = iq.notna() & age.notna()
+iq_valid = iq[valid]
+age_valid = age[valid]
+
+# 畫出散佈圖與趨勢線
+plt.figure(figsize=(8, 6))
+sns.regplot(x=iq_valid, y=age_valid, scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+plt.title("IQ vs. Age of First Kiss")
+plt.xlabel("IQ")
+plt.ylabel("Age of First Kiss")
+plt.grid(True)
+
+# 儲存圖檔
+plt.savefig("IQ_vs_Age_of_First_Kiss.png", dpi=300)
+plt.show()
