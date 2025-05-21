@@ -45,3 +45,38 @@ print("r-value =", r)
 print("t-value =", t_value)
 print("p-value =", p_excel)
 print("→ So, the relationship is", significance.lower() + ".")
+
+# 匯入套件
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 讀取資料
+df = pd.read_excel("/content/Data.xlsx")
+
+# 數值轉換
+df['Gender_num'] = df['Gender'].map({'male': 1, 'female': 0})
+df['IQ'] = pd.to_numeric(df['IQ'], errors='coerce')
+
+# 取前200筆資料
+gender = df['Gender_num'].iloc[0:200]
+iq = df['IQ'].iloc[0:200]
+
+# 整合成新 dataframe，過濾 NaN
+valid = gender.notna() & iq.notna()
+data = pd.DataFrame({
+    'Gender': gender[valid].map({1: 'Male', 0: 'Female'}),
+    'IQ': iq[valid]
+})
+
+# 畫圖：Boxplot
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Gender', y='IQ', data=data, palette='pastel')
+plt.title("Gender vs. IQ")
+plt.xlabel("Gender")
+plt.ylabel("IQ")
+plt.grid(True, axis='y')
+
+# 儲存圖片
+plt.savefig("Gender_vs_IQ.png", dpi=300)
+plt.show()
