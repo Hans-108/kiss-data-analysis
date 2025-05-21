@@ -45,3 +45,38 @@ print("r-value =", r)
 print("t-value =", t_value)
 print("p-value =", p_excel)
 print("→ So, the relationship is", significance.lower() + ".")
+
+# 匯入套件
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 讀取資料
+df = pd.read_excel("/content/Data.xlsx")
+
+# 數值轉換
+df['Gender_num'] = df['Gender'].map({'male': 1, 'female': 0})
+df['Age of First Kiss'] = pd.to_numeric(df['Age of First Kiss'], errors='coerce')
+
+# 取前200筆資料
+gender = df['Gender_num'].iloc[0:200]
+age = df['Age of First Kiss'].iloc[0:200]
+
+# 整合成資料表，過濾 NaN
+valid = gender.notna() & age.notna()
+data = pd.DataFrame({
+    'Gender': gender[valid].map({1: 'Male', 0: 'Female'}),
+    'Age of First Kiss': age[valid]
+})
+
+# 畫圖
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Gender', y='Age of First Kiss', data=data, palette='pastel')
+plt.title("Gender vs. Age of First Kiss")
+plt.xlabel("Gender")
+plt.ylabel("Age of First Kiss")
+plt.grid(True, axis='y')
+
+# 儲存檔案
+plt.savefig("Gender_vs_Age_of_First_Kiss.png", dpi=300)
+plt.show()
