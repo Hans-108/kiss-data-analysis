@@ -44,3 +44,39 @@ print("r-value =", r)
 print("t-value =", t_value)
 print("p-value =", p_excel)
 print("→ So, the relationship is", significance.lower() + ".")
+
+# 匯入套件
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 載入 Excel 檔案（請先手動上傳）
+df = pd.read_excel("/content/Data.xlsx")
+
+# 將 Gender 轉成數值：male = 1, female = 0
+df['Gender_num'] = df['Gender'].map({'male': 1, 'female': 0})
+
+# 轉換為數值
+df['IQ'] = pd.to_numeric(df['IQ'], errors='coerce')
+df['Kiss Count'] = pd.to_numeric(df['Kiss Count'], errors='coerce')
+
+# 選取前200筆資料
+iq = df['IQ'].iloc[0:200]
+kiss = df['Kiss Count'].iloc[0:200]
+
+# 濾除 NaN
+valid = iq.notna() & kiss.notna()
+iq_valid = iq[valid]
+kiss_valid = kiss[valid]
+
+# 畫出散佈圖＋迴歸線
+plt.figure(figsize=(8, 6))
+sns.regplot(x=iq_valid, y=kiss_valid, scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+plt.title("IQ vs. Kiss Count")
+plt.xlabel("IQ")
+plt.ylabel("Kiss Count")
+plt.grid(True)
+
+# 儲存圖片為 PNG（上傳到 Overleaf 用）
+plt.savefig("IQ_vs_Kiss_Count.png", dpi=300)
+plt.show()
